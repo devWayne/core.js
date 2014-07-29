@@ -5,27 +5,17 @@ var core = (function() {
 		return core.init(selector, context)
 	};
 
-	$.fn = {
-		a: function() {
-			return console.log('hello');
-		}
-	};
-
 
 	core.init = function(selector, context) {
 		var dom;
-		if (!context) {
-			context = document;
-		}
-		if (!selector) {
-			return {}
+		if (!context) context = document;
+		if (!selector) return {};
+		if ($.isFunction(selector)) {
+		return	$(document).ready(selector);
 		} else {
 			dom = core.selectorng(context, selector);
 		}
 		dom.__proto__ = $.fn
-		//	dom.prototype=$.fn;
-		console.log(dom);
-		console.log(this);
 		return dom;
 	};
 
@@ -42,9 +32,24 @@ var core = (function() {
 			return elem.getElementsByTagName(selector_name);
 		}
 
-	
+
 	};
 	//core.Z.prototype = $.fn;
+
+	$.fn = {
+		a: function() {
+			return console.log('hello');
+		},
+		ready: function(callback) {
+			document.addEventListener('DOMContentLoaded', function() {
+				callback($)
+			}, false)
+		}
+	};
+	$.isFunction = function(arg) {
+		return arg != null && typeof(arg) == "function"
+	}
+
 	return $;
 })()
 window.$ === undefined && (window.$ = core)
