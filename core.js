@@ -1,25 +1,24 @@
 var core = (function() {
-	var core = {};
 
 	var $ = function(selector, context) {
-		return core.init(selector, context)
+		return init(selector, context)
 	};
 
 
-	core.init = function(selector, context) {
+	function init(selector, context) {
 		var dom;
 		if (!context) context = document;
 		if (!selector) return {};
 		if ($.isFunction(selector)) {
-		return	$(document).ready(selector);
+			return $.ready(selector);
 		} else {
-			dom = core.selectorng(context, selector);
+			dom = selectorng(context, selector);
 		}
-		dom.__proto__ = $.fn
+		dom.__proto__ = $.fn;
 		return dom;
 	};
 
-	core.selectorng = function(elem, selector) {
+	function selectorng(elem, selector) {
 		var isId = selector[0] == "#",
 			isClass = selector[0] == ".",
 			selector_name = isId || isClass ? selector.slice(1) : selector;
@@ -34,18 +33,19 @@ var core = (function() {
 
 
 	};
-	//core.Z.prototype = $.fn;
+
 
 	$.fn = {
-		a: function() {
-			return console.log('hello');
-		},
-		ready: function(callback) {
-			document.addEventListener('DOMContentLoaded', function() {
-				callback($)
-			}, false)
+		this: function() {
+			return console.log(this);
 		}
 	};
+
+	$.ready = function(callback) {
+		document.addEventListener('DOMContentLoaded', function() {
+			callback($)
+		}, false)
+	}
 	$.isFunction = function(arg) {
 		return arg != null && typeof(arg) == "function"
 	}
