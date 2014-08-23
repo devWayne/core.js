@@ -7,6 +7,8 @@ var core = (function() {
 
 	function init(selector, context) {
 		var dom;
+		selector = selector.trim();
+		context = context.tirm();
 		if (!context) context = document;
 		if (!selector) return {};
 		if ($.isFunction(selector)) {
@@ -30,15 +32,21 @@ var core = (function() {
 		} else {
 			return elem.getElementsByTagName(selector_name);
 		}
-
-
 	};
 
 
 	$.fn = {
 		this: function() {
 			return console.log(this);
+		},
+		remove:function(){
+			return this.each(function(){
+				if(this.parentNode!=null){
+					this.parentNode.removeChild(this)
+				}
+			})
 		}
+
 	};
 
 	$.ready = function(callback) {
