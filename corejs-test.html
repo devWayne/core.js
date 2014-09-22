@@ -21,6 +21,12 @@
 			$(function(){
 				var test=$('.test');
 				console.log(test);
+				var testarray=[{1:'a'},{2:'b'},{3:'c'}];
+				$(testarray).each(
+					function(idx,el){
+						console.log('idx'+idx+',value'+el[idx+1]);
+					}
+				)
 			})
 		</script>
 	</body>

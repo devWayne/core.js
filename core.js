@@ -1,5 +1,5 @@
 var core = (function() {
-
+	var _array = [];
 	var $ = function(selector, context) {
 		return init(selector, context)
 	};
@@ -7,13 +7,15 @@ var core = (function() {
 
 	function init(selector, context) {
 		var dom;
-		selector = selector.trim();
-		context = context.tirm();
+		//selector = selector.trim();
+		//context = context.tirm();
 		if (!context) context = document;
 		if (!selector) return {};
+		if ($.isArray(selector)) dom = selector;
 		if ($.isFunction(selector)) {
 			return $.ready(selector);
-		} else {
+		}
+		if (dom == undefined) {
 			dom = selectorng(context, selector);
 		}
 		dom.__proto__ = $.fn;
@@ -39,24 +41,44 @@ var core = (function() {
 		this: function() {
 			return console.log(this);
 		},
-		remove:function(){
-			return this.each(function(){
-				if(this.parentNode!=null){
+		remove: function() {
+			return this.each(function() {
+				if (this.parentNode != null) {
 					this.parentNode.removeChild(this)
 				}
+			})
+		},
+		empty: function() {
+			return this.each(function() {
+				this.innerHTML = ''
+			})
+		},
+		each: function(callback) {
+			_array.every.call(this, function(el, idx) {
+				return callback.call(el, idx, el) !== false
 			})
 		}
 
 	};
-
+	$.isArray = Array.isArray ||
+		function(object) {
+			return object instanceof Array
+	}
 	$.ready = function(callback) {
 		document.addEventListener('DOMContentLoaded', function() {
 			callback($)
 		}, false)
 	}
-	$.isFunction = function(arg) {
-		return arg != null && typeof(arg) == "function"
+	$.isFunction = function(obj) {
+		return obj != null && typeof(obj) == "function"
 	}
+	$.isWindow = function(obj) {
+		return obj !== null && obj == obj.window
+	}
+	$.isDocument = function(obj) {
+		return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
+	}
+
 
 	return $;
 })()
