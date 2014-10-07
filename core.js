@@ -57,6 +57,15 @@ var core = (function() {
 			_array.every.call(this, function(el, idx) {
 				return callback.call(el, idx, el) !== false
 			})
+		},
+		css:function(elem,value){
+			if(arguments.length<2){
+				var result=this[0].getComputedStyle(elem,'');
+				return result;
+			}
+			else{
+
+			}
 		}
 
 	};
