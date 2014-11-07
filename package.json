@@ -1,0 +1,32 @@
+{
+  "name": "core.js",
+  "version": "0.1.0",
+  "description": "light-weight jQuery",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devWayne/core.js.git"
+  },
+   "devDependencies": {
+    "del": "^0.1.3",
+    "gulp": "^3.8.9",
+    "gulp-jshint": "^1.8.6",
+    "gulp-load-plugins": "^0.7.0",
+    "jshint-stylish": "^1.0.0",
+    "run-sequence": "^1.0.1",
+     "gulp-concat":"*",
+     "gulp-uglify":"*"
+  },
+  "h5bp-configs": {
+    "directories": {
+      "archive": "archive",
+      "src": "src",
+      "dist": "dist"
+    }
+  },
+  "keywords": [],
+  "author": "Vi",
+  "license": "MIT"
+}

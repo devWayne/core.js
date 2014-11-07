@@ -24,8 +24,8 @@ var core = (function() {
 
 	function getdom(elem, selector) {
 		var isId = selector[0] == "#",
-			isClass = selector[0] == ".",
-			selector_name = isId || isClass ? selector.slice(1) : selector;
+		isClass = selector[0] == ".",
+		selector_name = isId || isClass ? selector.slice(1) : selector;
 		if (isId) {
 			return elem.getElementsById(selector_name);
 		}
@@ -53,15 +53,24 @@ var core = (function() {
 				this.innerHTML = ''
 			})
 		},
+		eq:function(idx){
+			return idx===-1?this.slice(-1):this.slice(idx,idx+1);
+		},
 		css:function(elem,value){
 			if(arguments.length<2){
 				var result=this[0].getComputedStyle(elem,'');
 				return result;
 			}
 			else{
-
+			if (typeof(value) == 'string') {
+			var css = elem + ":" + value;
+			return this.each(function(){ this.style.cssText += ';' + css })
 			}
-		}
+		},
+		hide: function(){
+      			return this.css("display", "none")
+    		},
+
 
 	};
 	$.isArray = Array.isArray ||
@@ -100,7 +109,7 @@ var core = (function() {
        				 var ms = time*3600*1000;
        				 date.setTime(date.getTime() + ms);
        				 str += "; expires=" + date.toUTCString();
-   			}
+   			 }
 		}
 		document.cookie = str;
 	}
@@ -108,4 +117,4 @@ var core = (function() {
 
 	return $;
 })()
-window.$ === undefined && (window.$ = core)
+window.$ === undefined && (window.$ = core);
