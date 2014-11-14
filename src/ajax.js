@@ -1,6 +1,5 @@
-;
-(function($) {
-    function CreateXHR() {
+;(function($) {
+    function createXHR() {
         var xhr = false;
         try {
             xhr = new ActiveXObject("Msxml2.XMLHTTP"); //ie msxml3.0+
@@ -15,7 +14,7 @@
             xhr = new XMLHttpRequest();
         }
         return xhr;
-    }
+    };
 
     $.ajax = function(option) {
         option.type = (option.type || 'GET').toUpperCase()
@@ -32,5 +31,5 @@
                 option.success && $.isFunction(option.success) && option.success(xhr.responseText)
             }
         }
-    }
+    };
 })(core)
