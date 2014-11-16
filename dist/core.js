@@ -26,7 +26,7 @@ var core = (function() {
             isClass = selector[0] == ".",
             selector_name = isId || isClass ? selector.slice(1) : selector;
         if (isId) {
-            return elem.getElementsById(selector_name);
+            return [elem.getElementById(selector_name)];
         }
         if (isClass) {
             return elem.getElementsByClassName(selector_name);
@@ -36,6 +36,14 @@ var core = (function() {
     };
 
     $.fn = {
+
+        each: function(callback) {
+            _array.every.call(this, function(el, idx) {
+                return callback.call(el, idx, el) !== false
+            })
+            return this
+        },
+
         remove: function() {
             return this.each(function() {
                 if (this.parentNode != null) {
@@ -81,16 +89,16 @@ var core = (function() {
             return this.css("display", "none")
         },
 
-	/**
-	 * Remove node 
-	 * @return {void}
-	 */
-	remove: function(){
-	    return this.each(function(){
-	      if(this.parentNode !=null)
-	      this.parentNode.removeChild(this);
-	    })
-	}
+        /**
+         * Remove node
+         * @return {void}
+         */
+        remove: function() {
+            return this.each(function() {
+                if (this.parentNode != null)
+                    this.parentNode.removeChild(this);
+            })
+        }
 
 
     };
