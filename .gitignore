@@ -26,3 +26,5 @@ node_modules
 *.swo
 *.swp
 .DS_Store
+test/test.html
+test.html
