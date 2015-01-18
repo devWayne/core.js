@@ -180,5 +180,4 @@ var core = (function() {
 
     return $;
 })();
-
-window.$ === undefined && (window.$ = core)
+this.$ === undefined && (this.$ = core)
