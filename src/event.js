@@ -15,8 +15,9 @@ var onStr = window.addEventListener ? 'addEventListener' : 'attachEvent',
 		 */
 
 		on:function(type, fn, capture){
-		  this[onStr](prefix + type, fn, capture || false);
-		  return fn;
+			return this.each(function(idx,v){
+				  v[onStr](prefix + type, fn, capture || false);
+			});
 		},
 			/**
 		 * Off `el` event `type`'s callback `fn`.
@@ -29,11 +30,10 @@ var onStr = window.addEventListener ? 'addEventListener' : 'attachEvent',
 		 */
 
 		 off:function(type, fn, capture){
-		  this[offStr](prefix + type, fn, capture || false);
-		  return fn;
+		 	return this.each(function(idx,v){
+				 v[offStr](prefix + type, fn, capture || false);
+		 	});
 		}
-
-
 	});
 
 })(core);

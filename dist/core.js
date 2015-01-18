@@ -15,13 +15,13 @@ var core = (function() {
             return $.ready(selector);
         }
         if (dom == undefined) {
-            dom = getdom(context, selector);
+            dom = getDom(context, selector);
         }
-        dom.__proto__ = $.fn;
+        dom.__proto__ =$.fn; 
         return dom;
     };
 
-    function getdom(elem, selector) {
+    function getDom(elem, selector) {
         var isId = selector[0] == "#",
             isClass = selector[0] == ".",
             selector_name = isId || isClass ? selector.slice(1) : selector;
@@ -236,8 +236,9 @@ var onStr = window.addEventListener ? 'addEventListener' : 'attachEvent',
 		 */
 
 		on:function(type, fn, capture){
-		  this[onStr](prefix + type, fn, capture || false);
-		  return fn;
+			return this.each(function(idx,v){
+				  v[onStr](prefix + type, fn, capture || false);
+			});
 		},
 			/**
 		 * Off `el` event `type`'s callback `fn`.
@@ -250,11 +251,10 @@ var onStr = window.addEventListener ? 'addEventListener' : 'attachEvent',
 		 */
 
 		 off:function(type, fn, capture){
-		  this[offStr](prefix + type, fn, capture || false);
-		  return fn;
+		 	return this.each(function(idx,v){
+				 v[offStr](prefix + type, fn, capture || false);
+		 	});
 		}
-
-
 	});
 
 })(core);

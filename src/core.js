@@ -15,13 +15,13 @@ var core = (function() {
             return $.ready(selector);
         }
         if (dom == undefined) {
-            dom = getdom(context, selector);
+            dom = getDom(context, selector);
         }
-        dom.__proto__ = $.fn;
+        dom.__proto__ =$.fn; 
         return dom;
     };
 
-    function getdom(elem, selector) {
+    function getDom(elem, selector) {
         var isId = selector[0] == "#",
             isClass = selector[0] == ".",
             selector_name = isId || isClass ? selector.slice(1) : selector;
