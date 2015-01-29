@@ -7,7 +7,7 @@ var core = (function() {
 
     function init(selector, context) {
         var dom;
-        selector = selector.trim();
+        //selector = selector.trim();
         if (!context) context = document;
         if (!selector) return {};
         if ($.isArray(selector)) dom = selector;
@@ -15,13 +15,13 @@ var core = (function() {
             return $.ready(selector);
         }
         if (dom == undefined) {
-            dom = getdom(context, selector);
+            dom = getDom(context, selector);
         }
-        dom.__proto__ = $.fn;
+        dom.__proto__ =$.fn; 
         return dom;
     };
 
-    function getdom(elem, selector) {
+    function getDom(elem, selector) {
         var isId = selector[0] == "#",
             isClass = selector[0] == ".",
             selector_name = isId || isClass ? selector.slice(1) : selector;
@@ -34,8 +34,66 @@ var core = (function() {
             return elem.getElementsByTagName(selector_name);
         }
     };
+    /**
+     * Concat two Object
+     * @param {Object} destination Description
+     * @param {Object} source Description
+     * @param {boolean} override Description
+     * @return {Object} description
+     */
+    $.extend = function(destination, source, override) {
+        if (override === undefined) {
+            override = true;
+        }
+        for (key in source) {
+            if (override || !(key in destination)) destination[key] = source[key];
+        }
+        return destination;
+    };
+    $.isNode = function(obj) {
+        return !!(obj && obj.nodeType);
+    };
 
-    $.fn = {
+    $.isArray = Array.isArray ||
+        function(object) {
+            return object instanceof Array
+        };
+    $.ready = function(callback) {
+        document.addEventListener('DOMContentLoaded', function() {
+            callback($)
+        }, false)
+    };
+    $.isFunction = function(obj) {
+        return obj != null && typeof(obj) == "function"
+    };
+    $.isWindow = function(obj) {
+        return obj !== null && obj == obj.window
+    };
+    $.isDocument = function(obj) {
+        return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
+    };
+
+    $.cookie = function(key, value, time) {
+        if (value == undefined && time == undefined) {
+            var cookieArr = document.cookie.split('; ');
+            for (var i = 0; i < cookieArr.length; i++) {
+                var _cookie = cookieArr[i].split('=');
+                if (key == _cookie[0]) return decodeURI(_cookie[1]);
+            }
+            return "";
+        } else {
+            var str = key + "=" + encodeURI(value);
+            if (time > 0) {
+                var date = new Date();
+                var ms = time * 3600 * 1000;
+                date.setTime(date.getTime() + ms);
+                str += "; expires=" + date.toUTCString();
+            }
+        }
+        document.cookie = str;
+    };
+
+    $.fn =  $.extend({
 
         each: function(callback) {
             _array.every.call(this, function(el, idx) {
@@ -98,75 +156,31 @@ var core = (function() {
                 if (this.parentNode != null)
                     this.parentNode.removeChild(this);
             })
+        },
+	
+	/**
+	 * Get offset
+	 * @return {void} description
+	 */
+        offset: function() {
+            if (this.length == 0) return null;
+            var obj = this[0].getBoundingClientRect();
+            return {
+                left: obj.left + window.pageXOffset,
+                top: obj.top + window.pageYOffset,
+                width: obj.width,
+                height: obj.height
+            };
         }
 
 
-    };
+    });
 
-    /**
-     * Concat two Object
-     * @param {Object} destination Description
-     * @param {Object} source Description
-     * @param {boolean} override Description
-     * @return {Object} description
-     */
-    $.extend = function(destination, source, override) {
-        if (override === undefined) {
-            override = true;
-        }
-        for (key in source) {
-            if (override || !(key in destination)) destination[key] = source[key];
-        }
-        return destination;
-    };
-    $.isNode = function(obj) {
-        return !!(obj && obj.nodeType);
-    };
-
-    $.isArray = Array.isArray ||
-        function(object) {
-            return object instanceof Array
-        };
-    $.ready = function(callback) {
-        document.addEventListener('DOMContentLoaded', function() {
-            callback($)
-        }, false)
-    };
-    $.isFunction = function(obj) {
-        return obj != null && typeof(obj) == "function"
-    };
-    $.isWindow = function(obj) {
-        return obj !== null && obj == obj.window
-    };
-    $.isDocument = function(obj) {
-        return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
-    };
-
-    $.cookie = function(key, value, time) {
-        if (value == undefined && time == undefined) {
-            var cookieArr = document.cookie.split('; ');
-            for (var i = 0; i < cookieArr.length; i++) {
-                var _cookie = cookieArr[i].split('=');
-                if (key == _cookie[0]) return decodeURI(_cookie[1]);
-            }
-            return "";
-        } else {
-            var str = key + "=" + encodeURI(value);
-            if (time > 0) {
-                var date = new Date();
-                var ms = time * 3600 * 1000;
-                date.setTime(date.getTime() + ms);
-                str += "; expires=" + date.toUTCString();
-            }
-        }
-        document.cookie = str;
-    };
 
 
     return $;
 })();
-
-window.$ === undefined && (window.$ = core)
+this.$ === undefined && (this.$ = core)
 
 ;(function($) {
     function createXHR() {
@@ -205,28 +219,41 @@ window.$ === undefined && (window.$ = core)
 })(core)
 
 ;(function($){
+var onStr = window.addEventListener ? 'addEventListener' : 'attachEvent',
+    offStr = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
+    prefix = onStr !== 'addEventListener' ? 'on' : '';
 
-   /**
-    * Event function collection
-    */
-    $.event = {
+	$.fn=$.extend($.fn,{
+		/**
+		 * On `el` event `type` to `fn`.
+		 *
+		 * @param {String} type
+		 * @param {Function} fn
+		 * @param {Boolean} capture
+		 * @return {Function}
+		 * @api public
+		 */
 
-	   /**
-	    * @param {varType} elem Description
-	    * @param {varType} type Description
-	    * @param {varType} callback Description
-	    * @return {void} description
-	    */
-	    add:function(elem,type,callback){
-		if(elem.addEventListener){
-		elem.addEventListener(type,callback,false);	
-		}	     	
-		else{
-		elem.attchEvent(type,callback);	
+		on:function(type, fn, capture){
+			return this.each(function(idx,v){
+				  v[onStr](prefix + type, fn, capture || false);
+			});
+		},
+			/**
+		 * Off `el` event `type`'s callback `fn`.
+		 *
+		 * @param {String} type
+		 * @param {Function} fn
+		 * @param {Boolean} capture
+		 * @return {Function}
+		 * @api public
+		 */
+
+		 off:function(type, fn, capture){
+		 	return this.each(function(idx,v){
+				 v[offStr](prefix + type, fn, capture || false);
+		 	});
 		}
-	    },
-	    remove:function(){
-	  
-	    }
-    };
+	});
+
 })(core);
