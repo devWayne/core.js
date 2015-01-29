@@ -1,6 +1,6 @@
 var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
-var runSequence = require('run-sequence');    
+var runSequence = require('run-sequence');
 var pkg = require('./package.json');
 var dirs = pkg['h5bp-configs'].directories;
 var concat = require('gulp-concat');
@@ -9,33 +9,33 @@ var uglify = require('gulp-uglify');
 
 
 gulp.task('concat:js', function() {
-  return gulp.src([dirs.src +'/core.js',dirs.src +'/ajax.js',dirs.src +'/event.js'])
-    .pipe(concat('core.js'))
-    .pipe(gulp.dest(dirs.dist))
+    return gulp.src([dirs.src + '/core.js', dirs.src + '/ajax.js', dirs.src + '/event.js'])
+        .pipe(concat('core.js'))
+        .pipe(gulp.dest(dirs.dist))
 });
 gulp.task('compress:js', function() {
-  return gulp.src([dirs.src +'/core.js',dirs.src +'/ajax.js',dirs.src +'/event.js'])
-    .pipe(concat('core.min.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest(dirs.dist))
+    return gulp.src([dirs.src + '/core.js', dirs.src + '/ajax.js', dirs.src + '/event.js'])
+        .pipe(concat('core.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest(dirs.dist))
 });
 
 
 
 
-gulp.task('jshint', function () {
+gulp.task('jshint', function() {
     return gulp.src([
-        'gulpfile.js',
-         dirs.src+'/*.js'
-    ]).pipe(plugins.jshint())
-      .pipe(plugins.jshint.reporter('jshint-stylish'))
+            'gulpfile.js',
+            dirs.src + '/*.js'
+        ]).pipe(plugins.jshint())
+        .pipe(plugins.jshint.reporter('jshint-stylish'))
 });
 
 
 // -----------------------------------------------------------------------------
 // | Main tasks                                                                |
 // -----------------------------------------------------------------------------
-gulp.task('clean', function (done) {
+gulp.task('clean', function(done) {
     require('del')([
         dirs.dist
     ], done);
@@ -43,15 +43,15 @@ gulp.task('clean', function (done) {
 
 
 
-gulp.task('build', function (done) {
+gulp.task('build', function(done) {
     runSequence(
         ['clean'],
-	'concat:js',
-	'compress:js',
-    done);
+        'concat:js',
+        'compress:js',
+        done);
 });
 
-gulp.task('watch', function () {
+gulp.task('watch', function() {
     gulp.watch('src/*.js', ['build']);
 });
 
