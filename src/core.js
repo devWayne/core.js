@@ -21,21 +21,23 @@ var core = (function() {
         return dom;
     };
 
-    function getDom(elem, selector) {
-        var isId = selector[0] == "#",
-            isClass = selector[0] == ".",
-            selector_name = isId || isClass ? selector.slice(1) : selector;
-        if (isId) {
-            return [elem.getElementById(selector_name)];
-        }
-        if (isClass) {
-            return elem.getElementsByClassName(selector_name);
-        } else {
-            return elem.getElementsByTagName(selector_name);
-        }
-    };
     /**
-     * Concat two Object
+     * Simple selector
+     * @param {varType} elem Description
+     * @param {varType} selector Description
+     * @return {void} description
+     */
+    function getDom(elem, selector) {
+        var isId = selector[0] == "#",isClass = selector[0] == ".";
+        var selector_name = isId || isClass ? selector.slice(1) : selector,
+	 singleQueryFlag =  /^[\w-]*$/.test(selector_name)
+        if (isId && singleQueryFlag)return [elem.getElementById(selector_name)];
+	else if (isClass && singleQueryFlag)return elem.getElementsByClassName(selector_name);
+ 	else return elem.querySelectorAll(selector_name);
+    };
+    
+    /**
+     * Assign Objects
      * @param {Object} destination Description
      * @param {Object} source Description
      * @param {boolean} override Description
