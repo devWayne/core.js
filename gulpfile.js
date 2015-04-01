@@ -9,13 +9,13 @@ var uglify = require('gulp-uglify');
 
 
 gulp.task('concat:js', function() {
-    return gulp.src([dirs.src + '/core.js', dirs.src + '/ajax.js', dirs.src + '/event.js', dirs.src + '/promise.js'])
+    return gulp.src([dirs.src + '/dom.js', dirs.src + '/ajax.js', dirs.src + '/event.js'])
         .pipe(concat('core.js'))
         .pipe(gulp.dest(dirs.dist))
 });
 gulp.task('compress:js', function() {
-    return gulp.src([dirs.src + '/core.js', dirs.src + '/ajax.js', dirs.src + '/event.js', dirs.src + '/promise.js'])
-        .pipe(concat('core.min.js'))
+    return gulp.src(dirs.dist + '/core.js')
+       // .pipe(concat('core.min.js'))
         .pipe(uglify())
         .pipe(gulp.dest(dirs.dist))
 });
@@ -47,7 +47,7 @@ gulp.task('build', function(done) {
     runSequence(
         ['clean'],
         'concat:js',
-        'compress:js',
+        //'compress:js',
         done);
 });
 

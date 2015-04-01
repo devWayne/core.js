@@ -23,7 +23,6 @@
     },
     "h5bp-configs": {
         "directories": {
-            "archive": "archive",
             "src": "src",
             "dist": "dist"
         }

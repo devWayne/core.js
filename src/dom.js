@@ -17,25 +17,26 @@ var core = (function() {
         if (dom == undefined) {
             dom = getDom(context, selector);
         }
-        dom.__proto__ =$.fn; 
+        dom.__proto__ = $.fn;
         return dom;
     };
 
     /**
-     * Simple selector
+     * Selector
      * @param {varType} elem Description
      * @param {varType} selector Description
      * @return {void} description
      */
     function getDom(elem, selector) {
-        var isId = selector[0] == "#",isClass = selector[0] == ".";
+        var isId = selector[0] == "#",
+            isClass = selector[0] == ".";
         var selector_name = isId || isClass ? selector.slice(1) : selector,
-	 singleQueryFlag =  /^[\w-]*$/.test(selector_name)
-        if (isId && singleQueryFlag)return [elem.getElementById(selector_name)];
-	else if (isClass && singleQueryFlag)return elem.getElementsByClassName(selector_name);
- 	else return elem.querySelectorAll(selector_name);
+            singleQueryFlag = /^[\w-]*$/.test(selector_name)
+        if (isId && singleQueryFlag) return [elem.getElementById(selector_name)];
+        else if (isClass && singleQueryFlag) return elem.getElementsByClassName(selector_name);
+        else return elem.querySelectorAll(selector_name);
     };
-    
+
     /**
      * Assign Objects
      * @param {Object} destination Description
@@ -44,9 +45,7 @@ var core = (function() {
      * @return {Object} description
      */
     $.extend = function(destination, source, override) {
-        if (override === undefined) {
-            override = true;
-        }
+        override = override ? override || true;
         for (key in source) {
             if (override || !(key in destination)) destination[key] = source[key];
         }
@@ -55,6 +54,10 @@ var core = (function() {
     $.isNode = function(obj) {
         return !!(obj && obj.nodeType);
     };
+    $.isDocument = function(obj) {
+        return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
+    };
+
 
     $.isArray = Array.isArray ||
         function(object) {
@@ -71,10 +74,6 @@ var core = (function() {
     $.isWindow = function(obj) {
         return obj !== null && obj == obj.window
     };
-    $.isDocument = function(obj) {
-        return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
-    };
-
     $.cookie = function(key, value, time) {
         if (value == undefined && time == undefined) {
             var cookieArr = document.cookie.split('; ');
@@ -95,7 +94,7 @@ var core = (function() {
         document.cookie = str;
     };
 
-    $.fn =  $.extend({
+    $.fn = $.extend({
 
         each: function(callback) {
             _array.every.call(this, function(el, idx) {
@@ -159,11 +158,11 @@ var core = (function() {
                     this.parentNode.removeChild(this);
             })
         },
-	
-	/**
-	 * Get offset
-	 * @return {void} description
-	 */
+
+        /**
+         * Get offset
+         * @return {void} description
+         */
         offset: function() {
             if (this.length == 0) return null;
             var obj = this[0].getBoundingClientRect();

@@ -17,34 +17,35 @@ var core = (function() {
         if (dom == undefined) {
             dom = getDom(context, selector);
         }
-        dom.__proto__ =$.fn; 
+        dom.__proto__ = $.fn;
         return dom;
     };
 
+    /**
+     * Selector
+     * @param {varType} elem Description
+     * @param {varType} selector Description
+     * @return {void} description
+     */
     function getDom(elem, selector) {
         var isId = selector[0] == "#",
-            isClass = selector[0] == ".",
-            selector_name = isId || isClass ? selector.slice(1) : selector;
-        if (isId) {
-            return [elem.getElementById(selector_name)];
-        }
-        if (isClass) {
-            return elem.getElementsByClassName(selector_name);
-        } else {
-            return elem.getElementsByTagName(selector_name);
-        }
+            isClass = selector[0] == ".";
+        var selector_name = isId || isClass ? selector.slice(1) : selector,
+            singleQueryFlag = /^[\w-]*$/.test(selector_name)
+        if (isId && singleQueryFlag) return [elem.getElementById(selector_name)];
+        else if (isClass && singleQueryFlag) return elem.getElementsByClassName(selector_name);
+        else return elem.querySelectorAll(selector_name);
     };
+
     /**
-     * Concat two Object
+     * Assign Objects
      * @param {Object} destination Description
      * @param {Object} source Description
      * @param {boolean} override Description
      * @return {Object} description
      */
     $.extend = function(destination, source, override) {
-        if (override === undefined) {
-            override = true;
-        }
+        override = override ? override || true;
         for (key in source) {
             if (override || !(key in destination)) destination[key] = source[key];
         }
@@ -53,6 +54,10 @@ var core = (function() {
     $.isNode = function(obj) {
         return !!(obj && obj.nodeType);
     };
+    $.isDocument = function(obj) {
+        return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
+    };
+
 
     $.isArray = Array.isArray ||
         function(object) {
@@ -69,10 +74,6 @@ var core = (function() {
     $.isWindow = function(obj) {
         return obj !== null && obj == obj.window
     };
-    $.isDocument = function(obj) {
-        return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
-    };
-
     $.cookie = function(key, value, time) {
         if (value == undefined && time == undefined) {
             var cookieArr = document.cookie.split('; ');
@@ -93,7 +94,7 @@ var core = (function() {
         document.cookie = str;
     };
 
-    $.fn =  $.extend({
+    $.fn = $.extend({
 
         each: function(callback) {
             _array.every.call(this, function(el, idx) {
@@ -157,11 +158,11 @@ var core = (function() {
                     this.parentNode.removeChild(this);
             })
         },
-	
-	/**
-	 * Get offset
-	 * @return {void} description
-	 */
+
+        /**
+         * Get offset
+         * @return {void} description
+         */
         offset: function() {
             if (this.length == 0) return null;
             var obj = this[0].getBoundingClientRect();
@@ -180,7 +181,7 @@ var core = (function() {
 
     return $;
 })();
-this.$ === undefined && (this.$ = core)
+//this.$ === undefined && (this.$ = core)
 
 ;(function($) {
     function createXHR() {
@@ -255,95 +256,5 @@ var onStr = window.addEventListener ? 'addEventListener' : 'attachEvent',
 		 	});
 		}
 	});
-
-})(core);
-
-;(function($) {
-    function Promise(resolver) {
-        var queue = []
-        resolver(resolve, reject)
-
-        function next(i, val) {
-            setTimeout(function() { // dirty but out queue(resolve, reject) must wait then inqueue
-                while (queue.length) {
-                    var arr = queue.shift()
-                    if (typeof arr[i] === 'function') {
-                        try {
-                            var chain = arr[i](val)
-                        } catch (e) {
-                            return reject(e)
-                        }
-                        if (chain && typeof chain.then === 'function') {
-                            return chain.then(resolve, reject)
-                        } else {
-                            return $.promise.resolved(chain).then(resolve, reject)
-                        }
-                    }
-                }
-            })
-        }
-
-        function resolve(x) {
-            next(0, x)
-        }
-
-        function reject(reason) {
-            next(1, reason)
-        }
-
-        this.chain = this.then = function(resolve, reject) {
-            queue.push([resolve, reject])
-            return this
-        }
-
-        this.catch = function(reject) {
-            return this.then(undefined, reject)
-        }
-
-    }
-
-
-    $.promise = function(resolver){
-	return new Promise(resolver);
-    }
-
-        $.promise.resolved = Promise.cast = function(x) {
-        return new Promise(function(resolve) {
-            resolve(x)
-        })
-    }
-
-    $.promise.rejected = function(reason) {
-        return new Promise(function(resolve, reject) {
-            reject(reason)
-        })
-    }
-
-    $.promise.all = function(values) {
-        var defer = Promise.deferred()
-        var len = values.length
-        var results = []
-        values.forEach(function(p, i) {
-            p.then(function(x) {
-                results[i] = x
-                len--
-                if (len === 0) {
-                    defer.resolve(results)
-                }
-            }, function(r) {
-                defer.reject(r)
-            })
-        })
-        return defer.promise
-    }
-
-    $.promise.deferred = function() {
-        var result = {}
-        result.promise = new Promise(function(resolve, reject) {
-            result.resolve = resolve
-            result.reject = reject
-        })
-        return result
-    }
 
 })(core);
