@@ -97,6 +97,12 @@ var core = (function() {
         }
         document.cookie = str;
     };
+    $.each = function(elements,callback){
+    	_array.forEach.call(elements,callback);
+    };
+    $.map = function(elements,callback){
+    	_array.map.call(elements,callback);
+    };
 
 
     //prototype
@@ -239,8 +245,8 @@ var core = (function() {
 	},
 
         empty: function() {
-            return this.each(function() {
-                this.innerHTML = ''
+            return this.forEach(function(el) {
+               el.innerHTML = ''
             })
         },
         /**
@@ -253,8 +259,11 @@ var core = (function() {
                     this.parentNode.removeChild(this);
             })
         },
-	pluck:function(){
 	
+	pluck:function(property){
+	    return $.map(this,function(el){
+	    	return el[property]
+	    })
 	}
 
 
