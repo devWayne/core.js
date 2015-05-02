@@ -1,3 +1,4 @@
+;
 var core = (function() {
     var _array = [];
     var $ = function(selector, context) {
@@ -37,6 +38,9 @@ var core = (function() {
         else return elem.querySelectorAll(selector_name);
     };
 
+
+    //Utils functions	
+
     /**
      * Assign Objects
      * @param {Object} destination Description
@@ -45,8 +49,8 @@ var core = (function() {
      * @return {Object} description
      */
     $.extend = function(destination, source, override) {
-        override = override ? override || true;
-        for (key in source) {
+        override = override ? override : true;
+        for (var key in source) {
             if (override || !(key in destination)) destination[key] = source[key];
         }
         return destination;
@@ -94,30 +98,74 @@ var core = (function() {
         document.cookie = str;
     };
 
+
+    //prototype
+
     $.fn = $.extend({
-
-        each: function(callback) {
-            _array.every.call(this, function(el, idx) {
-                return callback.call(el, idx, el) !== false
-            })
-            return this
+        forEach: function(callback) {
+            _array.forEach.call(this,callback);
         },
 
-        remove: function() {
-            return this.each(function() {
-                if (this.parentNode != null) {
-                    this.parentNode.removeChild(this)
-                }
-            })
+	map:function(callback){
+	    _array.map.call(this,callback);
+	},
+        //HTML/Text/Value
+        text: function(text) {
+            return 0 in arguments ? (this.forEach(function(el) {
+                el.textContent = text
+            })) : this[0].textContent;
         },
-        empty: function() {
-            return this.each(function() {
-                this.innerHTML = ''
-            })
+
+        html: function(html) {
+            return 0 in arguments ? (this.forEach(function(el) {
+                el.innerHTML = html
+            })) : this[0].innerHTML;
         },
-        eq: function(idx) {
-            return idx === -1 ? this.slice(-1) : this.slice(idx, idx + 1);
+
+        val: function(val) {
+            return 0 in arguments ? (this.forEach(function(el) {
+                el.value = val
+            })) : this[0].value;
         },
+
+        //Class and Attributes
+        attr: function(name, value) {
+            if (arguments.length < 2) {
+                return name ? this[0].getAttribute(name) : false;
+            } else {
+                return this.forEach(function(el) {
+                    el.setAttribute(name, value);
+                })
+            }
+        },
+
+        removeAttr: function(name) {
+            return name ? (this.nodeType == 1 && this[0].setAttribute(name, '')) : false;
+        },
+
+        hasClass: function(cName) {
+            return cName ? _array.some.call(this, function(el) {
+                return !(new RegExp('(^|\\s)' + name + '(\\s|$)').test(el.className));
+            }) : false;
+        },
+
+        addClass: function() {
+            return this.forEach(function(el) {
+                el.classList.add("anotherclass")
+            });
+        },
+        removeClass: function() {
+            return this.forEach(function(el) {
+                el.classList.remove("anotherclass")
+            });
+        },
+        toggleClass: function() {
+            return this.forEach(function(el) {
+                el.classList.toggle("anotherclass")
+            });
+        },
+
+        //css和效果
         css: function(elem, value) {
             if (arguments.length < 2) {
                 var result = this[0].getComputedStyle(elem, '');
@@ -137,7 +185,10 @@ var core = (function() {
          * @return {void} description
          */
         show: function() {
-            return this.css('display', 'block');
+            return this.forEach(function(el) {
+                el.css("display", "block")
+            })
+
         },
 
         /**
@@ -145,19 +196,12 @@ var core = (function() {
          * @return {void} description
          */
         hide: function() {
-            return this.css("display", "none")
-        },
-
-        /**
-         * Remove node
-         * @return {void}
-         */
-        remove: function() {
-            return this.each(function() {
-                if (this.parentNode != null)
-                    this.parentNode.removeChild(this);
+            return this.forEach(function(el) {
+                el.css("display", "none")
             })
         },
+
+        //尺寸位置
 
         /**
          * Get offset
@@ -172,12 +216,50 @@ var core = (function() {
                 width: obj.width,
                 height: obj.height
             };
-        }
+        },
+
+        width: function() {
+            var obj = this[0].getBoundingClientRect();
+            return obj.width;
+        },
+
+        height: function() {
+            var obj = this[0].getBoundingClientRect();
+            return obj.height;
+        },
+
+        //Node Manipulation
+
+        eq: function(idx) {
+            return idx === -1 ? this.slice(-1) : this.slice(idx, idx + 1);
+        },
+
+        get: function() {
+	    return index === undefined ? slice.call(this) : this[index >= 0 ? index : index + this.length];
+	},
+
+        empty: function() {
+            return this.each(function() {
+                this.innerHTML = ''
+            })
+        },
+        /**
+         * Remove node
+         * @return {void}
+         */
+        remove: function() {
+            return this.each(function() {
+                if (this.parentNode != null)
+                    this.parentNode.removeChild(this);
+            })
+        },
+	pluck:function(){
+	
+	}
+
 
 
     });
-
-
 
     return $;
 })();
