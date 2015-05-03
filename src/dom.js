@@ -259,6 +259,21 @@ var core = (function() {
                     this.parentNode.removeChild(this);
             })
         },
+
+	find:function(){},
+
+	children:function(){},
+
+	parent:function(){},
+
+	parents:function(){},
+	
+	prev:function(){},
+
+	next:function(){},
+
+	siblings:function(){},
+
 	
 	pluck:function(property){
 	    return $.map(this,function(el){
@@ -269,6 +284,11 @@ var core = (function() {
 
 
     });
+
+    ['after','prepend','before','append'].forEach(function(operator, operatorIndex) {
+    
+    
+    })
 
     return $;
 })();
