@@ -4,6 +4,20 @@ core.js[![Build Status](https://travis-ci.org/devWayne/core.js.svg?branch=master
 
 ## Usage
 
+#### Gobal
+
+```html
+<script src="dist/core.js"></script>
+```
+
+#### Use Bower
+
+```shell
+$ bower install core.js
+
+```
+####
+
 ## API
 
 ### HTML/Text/Value
@@ -151,5 +165,3 @@ width(value)  ⇒ self
 height()  ⇒ number
 height(value)  ⇒ self
 ```
-
-### Utils
