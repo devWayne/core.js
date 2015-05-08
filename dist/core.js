@@ -7,16 +7,21 @@ var core = (function() {
 
 
     function init(selector, context) {
-        var dom;
+        var dom, elementTypes = [1, 9, 11];
         //selector = selector.trim();
         if (!context) context = document;
         if (!selector) return {};
-        if ($.isArray(selector)) dom = selector;
-        if ($.isFunction(selector)) {
+        else if ($.isFunction(selector)) {
             return $.ready(selector);
-        }
-        if (dom == undefined) {
-            dom = getDom(context, selector);
+        } else {
+            if ($.isArray(selector)) dom = selector;
+            //ELemets or HTMLCollection
+            if (elementTypes.indexOf(selector.nodeType) >= 0) dom = selector;
+            if (/^\[object (HTMLCollection|NodeList)\]$/.test(Object.prototype.toString.call(selector)) &&
+                selector.hasOwnProperty('length')) dom = selector;
+            if (dom == undefined) {
+                dom = getDom(context, selector);
+            }
         }
         dom.__proto__ = $.fn;
         return dom;
@@ -97,18 +102,21 @@ var core = (function() {
         }
         document.cookie = str;
     };
+    $.each = function(elements, callback) {
+        _array.forEach.call(elements, callback);
+    };
+    $.map = function(elements, callback) {
+        _array.map.call(elements, callback);
+    };
 
 
     //prototype
 
     $.fn = $.extend({
-        forEach: function(callback) {
-            _array.forEach.call(this,callback);
-        },
+        forEach: _array.forEach,
+        map: _array.map,
+        filter: _array.filter,
 
-	map:function(callback){
-	    _array.map.call(this,callback);
-	},
         //HTML/Text/Value
         text: function(text) {
             return 0 in arguments ? (this.forEach(function(el) {
@@ -231,16 +239,16 @@ var core = (function() {
         //Node Manipulation
 
         eq: function(idx) {
-            return idx === -1 ? this.slice(-1) : this.slice(idx, idx + 1);
+            return idx === -1 ? _array.slice.call(this, -1) : _array.slice.call(this, idx, idx + 1);
         },
 
-        get: function() {
-	    return index === undefined ? slice.call(this) : this[index >= 0 ? index : index + this.length];
-	},
+        get: function(idx) {
+            return index === undefined ? _array.slice.call(this) : this[index >= 0 ? index : index + this.length];
+        },
 
         empty: function() {
-            return this.each(function() {
-                this.innerHTML = ''
+            return this.forEach(function(el) {
+                el.innerHTML = ''
             })
         },
         /**
@@ -253,60 +261,62 @@ var core = (function() {
                     this.parentNode.removeChild(this);
             })
         },
-	pluck:function(){
-	
-	}
+
+        find: function() {
+
+        },
+
+        children: function(selector) {
+            var els = _array.filter.call(this.pluck('children'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
+
+        parent: function() {
+            var els = _array.filter.call(this.pluck('parentNode'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
+
+        parents: function() {},
+
+        prev: function() {
+            var els = _array.filter.call(this.pluck('previousElementSibling'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+
+        },
+
+        next: function() {
+            var els = _array.filter.call(this.pluck('nextElementSibling'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
+
+        siblings: function() {
+            var els =_array.filter.call(this.pluck('parentNode').children, function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
 
 
+        pluck: function(property) {
+            return this[0][property];
+        }
 
     });
 
-     /*['after', 'prepend', 'before', 'append'].forEach(function(operator, operatorIndex) {
-        $.fn[operator] = function() {
-
-        }
-    })
 
     ['after', 'prepend', 'before', 'append'].forEach(function(operator, operatorIndex) {
-        var inside = operatorIndex % 2;
-        JSLite.fn[operator] = function() {
-            var argType, nodes = JSLite.map(arguments, function(arg) {
-                    argType = JSLite.type(arg)
-                    if (argType == "Function") arg = funcArg(this, arg)
-                    return argType == "Object" || argType == "Array" || arg == null ? arg : P.fragment(arg)
-                }),
-                parent, script, copyByClone = this.length > 1
-            if (nodes.length < 1) return this
-            return this.each(function(_, target) {
-                parent = inside ? target : target.parentNode
-                target = operatorIndex == 0 ? target.nextSibling :
-                    operatorIndex == 1 ? target.firstChild :
-                    operatorIndex == 2 ? target :
-                    null;
 
-                var parentInDocument = JSLite.contains(document.documentElement, parent)
 
-                nodes.forEach(function(node) {
-                    var txt
-                    if (copyByClone) node = node.cloneNode(true)
-                    parent.insertBefore(node, target);
-                    if (parentInDocument && node.nodeName != null && node.nodeName.toUpperCase() === 'SCRIPT' &&
-                        (!node.type || node.type === 'text/javascript') && !node.src) txt = node.innerHTML;
-                    else if (parentInDocument && node.children && node.children.length > 0 && JSLite(node) && (script = JSLite(node).find("script")))
-                        if (script.length > 0) script.each(function(_, item) {
-                            txt = item.innerHTML
-                        });
-                    txt ? window['eval'].call(window, txt) : undefined;
-                });
-            })
-        }
-        JSLite.fn[inside ? operator + 'To' : 'insert' + (operatorIndex ? 'Before' : 'After')] = function(html) {
-            JSLite(html)[operator](this)
-            return this
-        }
-    });
+    })
 
-    */
     return $;
 })();
 this.$ === undefined && (this.$ = core)

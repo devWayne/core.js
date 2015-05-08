@@ -7,16 +7,21 @@ var core = (function() {
 
 
     function init(selector, context) {
-        var dom;
+        var dom, elementTypes = [1, 9, 11];
         //selector = selector.trim();
         if (!context) context = document;
         if (!selector) return {};
-        if ($.isArray(selector)) dom = selector;
-        if ($.isFunction(selector)) {
+        else if ($.isFunction(selector)) {
             return $.ready(selector);
-        }
-        if (dom == undefined) {
-            dom = getDom(context, selector);
+        } else {
+            if ($.isArray(selector)) dom = selector;
+            //ELemets or HTMLCollection
+            if (elementTypes.indexOf(selector.nodeType) >= 0) dom = selector;
+            if (/^\[object (HTMLCollection|NodeList)\]$/.test(Object.prototype.toString.call(selector)) &&
+                selector.hasOwnProperty('length')) dom = selector;
+            if (dom == undefined) {
+                dom = getDom(context, selector);
+            }
         }
         dom.__proto__ = $.fn;
         return dom;
@@ -97,24 +102,21 @@ var core = (function() {
         }
         document.cookie = str;
     };
-    $.each = function(elements,callback){
-    	_array.forEach.call(elements,callback);
+    $.each = function(elements, callback) {
+        _array.forEach.call(elements, callback);
     };
-    $.map = function(elements,callback){
-    	_array.map.call(elements,callback);
+    $.map = function(elements, callback) {
+        _array.map.call(elements, callback);
     };
 
 
     //prototype
 
     $.fn = $.extend({
-        forEach: function(callback) {
-            _array.forEach.call(this,callback);
-        },
+        forEach: _array.forEach,
+        map: _array.map,
+        filter: _array.filter,
 
-	map:function(callback){
-	    _array.map.call(this,callback);
-	},
         //HTML/Text/Value
         text: function(text) {
             return 0 in arguments ? (this.forEach(function(el) {
@@ -237,16 +239,16 @@ var core = (function() {
         //Node Manipulation
 
         eq: function(idx) {
-            return idx === -1 ? this.slice(-1) : this.slice(idx, idx + 1);
+            return idx === -1 ? _array.slice.call(this, -1) : _array.slice.call(this, idx, idx + 1);
         },
 
-        get: function() {
-	    return index === undefined ? slice.call(this) : this[index >= 0 ? index : index + this.length];
-	},
+        get: function(idx) {
+            return index === undefined ? _array.slice.call(this) : this[index >= 0 ? index : index + this.length];
+        },
 
         empty: function() {
             return this.forEach(function(el) {
-               el.innerHTML = ''
+                el.innerHTML = ''
             })
         },
         /**
@@ -260,34 +262,59 @@ var core = (function() {
             })
         },
 
-	find:function(){},
+        find: function() {
 
-	children:function(){},
+        },
 
-	parent:function(){},
+        children: function(selector) {
+            var els = _array.filter.call(this.pluck('children'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
 
-	parents:function(){},
-	
-	prev:function(){},
+        parent: function() {
+            var els = _array.filter.call(this.pluck('parentNode'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
 
-	next:function(){},
+        parents: function() {},
 
-	siblings:function(){},
+        prev: function() {
+            var els = _array.filter.call(this.pluck('previousElementSibling'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
 
-	
-	pluck:function(property){
-	    return $.map(this,function(el){
-	    	return el[property]
-	    })
-	}
+        },
+
+        next: function() {
+            var els = _array.filter.call(this.pluck('nextElementSibling'), function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
+
+        siblings: function() {
+            var els =_array.filter.call(this.pluck('parentNode').children, function(els) {
+                return els && els.nodeType == 1
+            });
+            return $(els);
+        },
 
 
+        pluck: function(property) {
+            return this[0][property];
+        }
 
     });
 
-    ['after','prepend','before','append'].forEach(function(operator, operatorIndex) {
-    
-    
+
+    ['after', 'prepend', 'before', 'append'].forEach(function(operator, operatorIndex) {
+
+
     })
 
     return $;
