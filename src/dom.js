@@ -66,7 +66,12 @@ var core = (function() {
     $.isDocument = function(obj) {
         return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
     };
-
+    $.isFunction = function(obj) {
+        return obj != null && typeof(obj) == "function"
+    };
+    $.isWindow = function(obj) {
+        return obj !== null && obj == obj.window
+    };
 
     $.isArray = Array.isArray ||
         function(object) {
@@ -76,12 +81,6 @@ var core = (function() {
         document.addEventListener('DOMContentLoaded', function() {
             callback($)
         }, false)
-    };
-    $.isFunction = function(obj) {
-        return obj != null && typeof(obj) == "function"
-    };
-    $.isWindow = function(obj) {
-        return obj !== null && obj == obj.window
     };
     $.cookie = function(key, value, time) {
         if (value == undefined && time == undefined) {
@@ -102,13 +101,6 @@ var core = (function() {
         }
         document.cookie = str;
     };
-    $.each = function(elements, callback) {
-        _array.forEach.call(elements, callback);
-    };
-    $.map = function(elements, callback) {
-        _array.map.call(elements, callback);
-    };
-
 
     //prototype
 
@@ -226,16 +218,6 @@ var core = (function() {
             };
         },
 
-        width: function() {
-            var obj = this[0].getBoundingClientRect();
-            return obj.width;
-        },
-
-        height: function() {
-            var obj = this[0].getBoundingClientRect();
-            return obj.height;
-        },
-
         //Node Manipulation
 
         eq: function(idx) {
@@ -298,7 +280,7 @@ var core = (function() {
         },
 
         siblings: function() {
-            var els =_array.filter.call(this.pluck('parentNode').children, function(els) {
+            var els = _array.filter.call(this.pluck('parentNode').children, function(els) {
                 return els && els.nodeType == 1
             });
             return $(els);
@@ -313,9 +295,27 @@ var core = (function() {
 
 
     ['after', 'prepend', 'before', 'append'].forEach(function(operator, operatorIndex) {
+        var inside = operatorIndex % 2;
+        $.fn[operator] = function(node) {
+            return this.each(function(target) {
+                parent = inside ? target : target.parentNode
+                target = operatorIndex == 0 ? target.nextSibling :
+                    operatorIndex == 1 ? target.firstChild :
+                    operatorIndex == 2 ? target : null;
+                parent.insertBefore(node, target);
+            });
+        }
+    });
 
-
-    })
+    ['width', 'height'].forEach(function(operator, operatorIndex) {
+        $.fn[operator] = function(value) {
+            var el = this[0];
+            if (arguments.length == 0) return $.isWindow(el) ? el['inner' + operator] : $.isDocument(el) ? el.documentElement['scroll' + operator] : (offset = this.offset()) && offset[operator];
+            else return this.each(function(v) {
+                v.css(operator, value);
+            })
+        }
+    });
 
     return $;
 })();
