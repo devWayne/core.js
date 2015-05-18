@@ -9,7 +9,7 @@ var uglify = require('gulp-uglify');
 
 
 gulp.task('concat:js', function() {
-    return gulp.src([dirs.src + '/dom.js', dirs.src + '/ajax.js', dirs.src + '/event.js'])
+    return gulp.src([dirs.src + '/core.js', dirs.src + '/ajax.js', dirs.src + '/event.js'])
         .pipe(concat('core.js'))
 	//.pipe(uglify())
         .pipe(gulp.dest(dirs.dist))

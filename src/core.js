@@ -1,7 +1,7 @@
 ;
 var core = (function() {
     var _array = [];
-    var $ = function(selector, context) {
+    var core = function(selector, context) {
         return init(selector, context)
     };
 
@@ -11,10 +11,10 @@ var core = (function() {
         //selector = selector.trim();
         if (!context) context = document;
         if (!selector) return {};
-        else if ($.isFunction(selector)) {
-            return $.ready(selector);
+        else if (core.isFunction(selector)) {
+            return core.ready(selector);
         } else {
-            if ($.isArray(selector)) dom = selector;
+            if (core.isArray(selector)) dom = selector;
             //ELemets or HTMLCollection
             if (elementTypes.indexOf(selector.nodeType) >= 0) dom = selector;
             if (/^\[object (HTMLCollection|NodeList)\]$/.test(Object.prototype.toString.call(selector)) &&
@@ -23,7 +23,7 @@ var core = (function() {
                 dom = getDom(context, selector);
             }
         }
-        dom.__proto__ = $.fn;
+        dom.__proto__ = core.fn;
         return dom;
     };
 
@@ -53,58 +53,63 @@ var core = (function() {
      * @param {boolean} override Description
      * @return {Object} description
      */
-    $.extend = function(destination, source, override) {
+    function extend(destination, source, override) {
         override = override ? override : true;
         for (var key in source) {
             if (override || !(key in destination)) destination[key] = source[key];
         }
         return destination;
     };
-    $.isNode = function(obj) {
-        return !!(obj && obj.nodeType);
-    };
-    $.isDocument = function(obj) {
-        return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
-    };
-    $.isFunction = function(obj) {
-        return obj != null && typeof(obj) == "function"
-    };
-    $.isWindow = function(obj) {
-        return obj !== null && obj == obj.window
-    };
 
-    $.isArray = Array.isArray ||
-        function(object) {
-            return object instanceof Array
-        };
-    $.ready = function(callback) {
-        document.addEventListener('DOMContentLoaded', function() {
-            callback($)
-        }, false)
-    };
-    $.cookie = function(key, value, time) {
-        if (value == undefined && time == undefined) {
-            var cookieArr = document.cookie.split('; ');
-            for (var i = 0; i < cookieArr.length; i++) {
-                var _cookie = cookieArr[i].split('=');
-                if (key == _cookie[0]) return decodeURI(_cookie[1]);
+    core = extend(core, {
+            extend: extend,
+            isNode: function(obj) {
+                return !!(obj && obj.nodeType);
+            },
+            isDocument: function(obj) {
+                return obj !== null && obj.nodeType == obj.DOCUMENT_NODE
+            },
+            isFunction: function(obj) {
+                return obj != null && typeof(obj) == "function"
+            },
+            isWindow: function(obj) {
+                return obj !== null && obj == obj.window
+            },
+            isArray: Array.isArray ||
+                function(object) {
+                    return Object.prototype.toString.call(object)=="[object Array]"; 
+                },
+            ready: function(callback) {
+                document.addEventListener('DOMContentLoaded', function() {
+                    callback(core)
+                }, false)
+            },
+            cookie: cookie = function(key, value, time) {
+                if (value == undefined && time == undefined) {
+                    var cookieArr = document.cookie.split('; ');
+                    for (var i = 0; i < cookieArr.length; i++) {
+                        var _cookie = cookieArr[i].split('=');
+                        if (key == _cookie[0]) return decodeURI(_cookie[1]);
+                    }
+                    return "";
+                } else {
+                    var str = key + "=" + encodeURI(value);
+                    if (time > 0) {
+                        var date = new Date();
+                        var ms = time * 3600 * 1000;
+                        date.setTime(date.getTime() + ms);
+                        str += "; expires=" + date.toUTCString();
+                    }
+                }
+                document.cookie = str;
             }
-            return "";
-        } else {
-            var str = key + "=" + encodeURI(value);
-            if (time > 0) {
-                var date = new Date();
-                var ms = time * 3600 * 1000;
-                date.setTime(date.getTime() + ms);
-                str += "; expires=" + date.toUTCString();
-            }
-        }
-        document.cookie = str;
-    };
+
+
+        });
 
     //prototype
 
-    $.fn = $.extend({
+    core.fn = core.extend({
         forEach: _array.forEach,
         map: _array.map,
         filter: _array.filter,
@@ -145,23 +150,23 @@ var core = (function() {
 
         hasClass: function(cName) {
             return cName ? _array.some.call(this, function(el) {
-                return !(new RegExp('(^|\\s)' + name + '(\\s|$)').test(el.className));
+                return !(new RegExp('(^|\\s)' + name + '(\\s|core)').test(el.className));
             }) : false;
         },
 
-        addClass: function() {
+        addClass: function(className) {
             return this.forEach(function(el) {
-                el.classList.add("anotherclass")
+                el.classList.add(className)
             });
         },
         removeClass: function() {
             return this.forEach(function(el) {
-                el.classList.remove("anotherclass")
+                el.classList.remove(className)
             });
         },
         toggleClass: function() {
             return this.forEach(function(el) {
-                el.classList.toggle("anotherclass")
+                el.classList.toggle(className)
             });
         },
 
@@ -252,14 +257,14 @@ var core = (function() {
             var els = _array.filter.call(this.pluck('children'), function(els) {
                 return els && els.nodeType == 1
             });
-            return $(els);
+            return core(els);
         },
 
         parent: function() {
             var els = _array.filter.call(this.pluck('parentNode'), function(els) {
                 return els && els.nodeType == 1
             });
-            return $(els);
+            return core(els);
         },
 
         parents: function() {},
@@ -268,7 +273,7 @@ var core = (function() {
             var els = _array.filter.call(this.pluck('previousElementSibling'), function(els) {
                 return els && els.nodeType == 1
             });
-            return $(els);
+            return core(els);
 
         },
 
@@ -276,14 +281,14 @@ var core = (function() {
             var els = _array.filter.call(this.pluck('nextElementSibling'), function(els) {
                 return els && els.nodeType == 1
             });
-            return $(els);
+            return core(els);
         },
 
         siblings: function() {
             var els = _array.filter.call(this.pluck('parentNode').children, function(els) {
                 return els && els.nodeType == 1
             });
-            return $(els);
+            return core(els);
         },
 
 
@@ -296,7 +301,7 @@ var core = (function() {
 
     ['after', 'prepend', 'before', 'append'].forEach(function(operator, operatorIndex) {
         var inside = operatorIndex % 2;
-        $.fn[operator] = function(node) {
+        core.fn[operator] = function(node) {
             return this.each(function(target) {
                 parent = inside ? target : target.parentNode
                 target = operatorIndex == 0 ? target.nextSibling :
@@ -308,15 +313,17 @@ var core = (function() {
     });
 
     ['width', 'height'].forEach(function(operator, operatorIndex) {
-        $.fn[operator] = function(value) {
+        core.fn[operator] = function(value) {
             var el = this[0];
-            if (arguments.length == 0) return $.isWindow(el) ? el['inner' + operator] : $.isDocument(el) ? el.documentElement['scroll' + operator] : (offset = this.offset()) && offset[operator];
+            if (arguments.length == 0) return core.isWindow(el) ? el['inner' + operator] : core.isDocument(el) ? el.documentElement['scroll' + operator] : (offset = this.offset()) && offset[operator];
             else return this.each(function(v) {
                 v.css(operator, value);
             })
         }
     });
 
-    return $;
+    return core;
 })();
-this.$ === undefined && (this.$ = core)
+this.$ = core;
+if (typeof module != 'undefined') module.exports = core;
+else if (typeof define == 'function' && typeof define.amd == 'object') define(core);

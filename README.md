@@ -165,3 +165,30 @@ width(value)  ⇒ self
 height()  ⇒ number
 height(value)  ⇒ self
 ```
+
+### Event Handler
+
+#### on()
+
+```
+on(type, [selector], function(e){ ... })  ⇒ self
+```
+
+#### off()
+
+```
+off(type, [selector], function(e){ ... })  ⇒ self
+off(type, [selector])  ⇒ self
+off()  ⇒ self
+```
+
+#### trigger()
+
+```
+trigger(event, [args])  ⇒ self
+```
+
+### XMLHttpRequest
+
+#### ajax()
+
